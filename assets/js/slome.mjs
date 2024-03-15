@@ -14,6 +14,7 @@ const sprites = new Sprites();
 
 export class Slome {
     constructor () {
+        console.log('Slome game started');
         this.canvas = new Canvas(new Vector2(800, 600));
         this.canvas.autoResize = true;
         this.canvas.fitScreen();
@@ -21,32 +22,40 @@ export class Slome {
         this.camera = new Vector2(0, 0);
         this.zoom = 1/10; // 1/2 = 50% zoom, 1 game unit is half the height of the screen
 
+        this.zoomBounds = new Vector2(1/20, 1/4);
+
         this.entities = [];
 
         this.world = new World(new Vector2(100, 100));
 
-        this.entities.push(new Player(Vector2.zero, 'slome', Vector2.one))
+        this.entities.push(new Player(Vector2.zero, 'slome', new Vector2 (0.83, 0.83)));
+        this.entities[0].position = new Vector2(this.world.size.x / 2 + 0.5, this.world.size.y / 2 + 0.5);
+        this.entities[0].projectedPosition = this.entities[0].position;
 
         time.subscribe((dt) => {
             this.draw(this.camera);
             this.entities.forEach(entity => {
-                if (entity.move) entity.move(input);
+                if (entity.move) entity.move(input, dt);
                 if (entity.update) entity.update(dt);
-                if (entity.fixedUpdate) entity.fixedUpdate();
             });
 
             this.camera = this.entities[0].projectedPosition;
-
-            if (input.getKey('KeyQ')) {
-                this.zoom = 1;
-            }
-            if (input.getKey('KeyE')) {
+            if (input.getKey('Equal')) {
                 this.zoom *= 1.01;
+                if (this.zoom > this.zoomBounds.y) this.zoom = this.zoomBounds.y;
             }
-            if (input.getKey('KeyZ')) {
+            if (input.getKey('Minus')) {
                 this.zoom *= 0.99;
+                if (this.zoom < this.zoomBounds.x) this.zoom = this.zoomBounds.x;
             }
         }, Time.mode.update);
+
+        time.subscribe(() => {
+            this.entities.forEach(entity => {
+                if (entity.physics) entity.physics(this.world);
+                if (entity.fixedUpdate) entity.fixedUpdate();
+            });
+        }, Time.mode.fixed);
 
         time.start();
     }

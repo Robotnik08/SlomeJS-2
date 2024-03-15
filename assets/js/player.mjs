@@ -4,31 +4,35 @@ export class Player extends Entity {
     constructor (position, sprite, size) {
         super(position, sprite, size);
 
-        this.speed = 3;
+        this.speed = 25;
+        this.jumpStrength = 1;
     }
 
-    move (input) {
-        if (input.getKey('KeyW')) {
-            this.velocity.y = -this.speed;
-        }
-        if (input.getKey('KeyS')) {
-            this.velocity.y = this.speed;
-        }
+    move (input, dt) {
         if (input.getKey('KeyA')) {
-            this.velocity.x = -this.speed;
+            this.velocity.x = -this.speed * dt;
         }
         if (input.getKey('KeyD')) {
-            this.velocity.x = this.speed;
+            this.velocity.x = this.speed * dt;
+        }
+        if (input.getKey('Space')) {
+            this.velocity.y -= this.jumpStrength;
         }
     }
 
-    fixedUpdate () {
+    fixedUpdate (world) {
         super.fixedUpdate();
-        this.position = this.position.add(this.velocity.divide(60));
-        this.velocity = this.velocity.multiply(0.9);
     }
 
     update (dt) {
         super.update(dt);
+    }
+
+    physics (world) {
+
+        this.position = this.position.add(this.velocity.divide(60));
+
+        this.velocity.x *= 0.9;
+        this.velocity.y += world.gravity * 0.00000004;
     }
 }
