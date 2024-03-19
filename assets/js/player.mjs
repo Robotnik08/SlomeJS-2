@@ -1,22 +1,31 @@
 import { Entity } from './entity.mjs';
+import { Vector2 } from './vector.mjs';
+import { HitBox } from './hitbox.mjs';
 
 export class Player extends Entity {
     constructor (position, sprite, size) {
         super(position, sprite, size);
 
-        this.speed = 25;
-        this.jumpStrength = 1;
+        this.hasPhysics = true;
+
+        this.hitbox = new HitBox(new Vector2(-0.35, -0.3), new Vector2(0.7, 0.7), [new Vector2(-0.35, -0.3), new Vector2(0.35, -0.3), new Vector2(-0.35, 0.4), new Vector2(0.35, 0.4)]);
+
+        this.max_speed = 4;
+        this.acceleration = 0.09;
+        this.jumpStrength = 12;
     }
 
     move (input, dt) {
         if (input.getKey('KeyA')) {
-            this.velocity.x = -this.speed * dt;
+            this.velocity.x -= this.acceleration * dt * 640;
+            if (this.velocity.x < -this.max_speed) this.velocity.x = -this.max_speed;
         }
         if (input.getKey('KeyD')) {
-            this.velocity.x = this.speed * dt;
+            this.velocity.x += this.acceleration * dt * 640;
+            if (this.velocity.x > this.max_speed) this.velocity.x = this.max_speed;
         }
-        if (input.getKey('Space')) {
-            this.velocity.y -= this.jumpStrength;
+        if (input.getKey('Space') && this.is_grounded) {
+            this.velocity.y = -this.jumpStrength;
         }
     }
 
@@ -26,13 +35,5 @@ export class Player extends Entity {
 
     update (dt) {
         super.update(dt);
-    }
-
-    physics (world) {
-
-        this.position = this.position.add(this.velocity.divide(60));
-
-        this.velocity.x *= 0.9;
-        this.velocity.y += world.gravity * 0.00000004;
     }
 }

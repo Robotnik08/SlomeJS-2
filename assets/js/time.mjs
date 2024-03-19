@@ -1,5 +1,5 @@
 export class Time {
-    FIXED_UPDATE_INTERVAL = 1 / 60;
+    FIXED_UPDATE_INTERVAL = 1000 / 60;
 
     constructor () {
         this.lastTime = 0;

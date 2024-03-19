@@ -14,7 +14,6 @@ const sprites = new Sprites();
 
 export class Slome {
     constructor () {
-        console.log('Slome game started');
         this.canvas = new Canvas(new Vector2(800, 600));
         this.canvas.autoResize = true;
         this.canvas.fitScreen();
