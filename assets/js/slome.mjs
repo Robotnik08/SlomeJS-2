@@ -19,16 +19,16 @@ export class Slome {
         this.canvas.fitScreen();
 
         this.camera = new Vector2(0, 0);
-        this.zoom = 10; // 2 = 50% zoom, 1 game unit is half the height of the screen
+        this.zoom = 14; // 2 = 50% zoom, 1 game unit is half the height of the screen
 
-        this.zoomBounds = new Vector2(20, 4);
+        this.zoomBounds = new Vector2(4, 20);
 
         this.entities = [];
 
-        this.world = new World(new Vector2(100, 100));
+        this.world = new World(new Vector2(1000, 500));
 
         this.entities.push(new Player(Vector2.zero, 'slome', new Vector2 (0.88, 0.88)));
-        this.entities[0].position = new Vector2(this.world.size.x / 2 + 0.5, this.world.size.y / 2 + 0.5);
+        this.entities[0].position = new Vector2(this.world.size.x / 2 + 0.5, 1);
         this.entities[0].projectedPosition = this.entities[0].position;
 
         time.subscribe((dt) => {
@@ -39,13 +39,16 @@ export class Slome {
             });
 
             this.camera = this.entities[0].projectedPosition;
-            if (input.getKey('Equal')) {
+            if (input.getKey('Minus')) {
                 this.zoom *= 1.01;
                 if (this.zoom > this.zoomBounds.y) this.zoom = this.zoomBounds.y;
             }
-            if (input.getKey('Minus')) {
+            if (input.getKey('Equal')) {
                 this.zoom *= 0.99;
                 if (this.zoom < this.zoomBounds.x) this.zoom = this.zoomBounds.x;
+            }
+            if (input.getKey('KeyE')) {
+                console.log(this.entities[0].position);
             }
         }, Time.mode.update);
 
@@ -77,8 +80,8 @@ export class Slome {
         camera_pixel = camera_pixel.subtract(this.canvas.size.divide(2));
         
         // draw world
-        for (let x = Math.max(0, camera.x - Math.round(unit_camera_size.x / 2 + 1)); x < Math.min(this.world.size.x, camera.x + Math.round(unit_camera_size.x / 2 + 1)); x++) {
-            for (let y = Math.max(0, camera.y - Math.round(unit_camera_size.y / 2 + 1)); y < Math.min(this.world.size.y, camera.y + Math.round(unit_camera_size.y / 2 + 1)); y++) {
+        for (let x = Math.max(0, camera.x - Math.round(unit_camera_size.x / 2 + 2)); x < Math.min(this.world.size.x, camera.x + Math.round(unit_camera_size.x / 2 + 2)); x++) {
+            for (let y = Math.max(0, camera.y - Math.round(unit_camera_size.y / 2 + 2)); y < Math.min(this.world.size.y, camera.y + Math.round(unit_camera_size.y / 2 + 2)); y++) {
                 const position = new Vector2(x, y);
 
                 if (!this.world.getTile(position)) continue;
