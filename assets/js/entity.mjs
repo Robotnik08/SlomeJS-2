@@ -23,7 +23,7 @@ export class Entity {
 
     update (dt) {
         // interpolate position based on delta time
-        this.projectedPosition = this.position;// Vector2.interpolate(this.projectedPosition, this.position, 10 * dt);
+        this.projectedPosition = Vector2.interpolate(this.projectedPosition, this.position, 100 * dt);
     }
 
     physics (world) {
@@ -54,67 +54,5 @@ export class Entity {
         this.is_grounded = groundedCheck;
 
         this.position = this.position.add(this.velocity.divide(60));
-
-        // const pass = {x: true, y: true};
-
-
-
-
-        // check top left
-
-        // let checkPosition = this.position.add(this.hitbox.topLeft);
-        // let tryCheckPosition = tryposition.add(this.hitbox.topLeft);
-
-        // if (world.getTile(new Vector2 (checkPosition.x, tryCheckPosition.y)) && pass.y) {
-        //     this.velocity.y = 0;
-        //     this.position.y = Math.round(this.position.y) - ((0.5 - EPSILON) - Math.abs(this.hitbox.topLeft.y));
-        //     pass.y = false;
-        // }
-
-        // if (world.getTile(new Vector2 (tryposition.add(this.hitbox.topLeft).x, this.position.add(this.hitbox.topLeft).y)) && pass.x) {
-        //     this.velocity.x = 0;
-        //     this.position.x = Math.round(this.position.x) + ((0.5 - EPSILON) - Math.abs(this.hitbox.topLeft.x));
-        //     pass.x = false;
-        // }
-
-        // check top right
-        // if (world.getTile(new Vector2 (tryposition.add(this.hitbox.topRight).x, this.position.add(this.hitbox.topLeft).y)) && pass.x) {
-        //     this.velocity.x = 0;
-        //     this.position.x = Math.round(this.position.x) + ((0.5 - EPSILON) - Math.abs(this.hitbox.topRight.x));
-        //     pass.x = false;
-        // }
-        // if (world.getTile(new Vector2 (this.position.add(this.hitbox.topRight).x, tryposition.add(this.hitbox.topLeft).y)) && pass.y) {
-        //     this.velocity.y = 0;
-        //     this.position.y = Math.round(this.position.y) + ((0.5 - EPSILON) - Math.abs(this.hitbox.topRight.y));
-        //     pass.y = false;
-        // }
-
-        // // check bottom left
-        // if (world.getTile(new Vector2 (tryposition.add(this.hitbox.bottomLeft).x, this.position.add(this.hitbox.bottomLeft).y)) && pass.x) {
-        //     this.velocity.x = 0;
-        //     this.position.x = Math.round(this.position.x) - ((0.5 - EPSILON) - Math.abs(this.hitbox.bottomLeft.x));
-        //     pass.x = false;
-        // }
-        // if (world.getTile(new Vector2 (this.position.add(this.hitbox.bottomLeft).x, tryposition.add(this.hitbox.bottomLeft).y)) && pass.y) {
-        //     this.velocity.y = 0;
-        //     this.position.y = Math.round(this.position.y) + ((0.5 - EPSILON) - Math.abs(this.hitbox.bottomLeft.y));
-        //     pass.y = false;
-        // }
-
-        // // check bottom right
-        // if (world.getTile(new Vector2 (tryposition.add(this.hitbox.bottomRight).x, this.position.add(this.hitbox.bottomRight).y)) && pass.x) {
-        //     this.velocity.x = 0;
-        //     this.position.x = Math.round(this.position.x) - ((0.5 - EPSILON) - Math.abs(this.hitbox.bottomRight.x));
-        //     pass.x = false;
-        // }
-        // if (world.getTile(new Vector2 (this.position.add(this.hitbox.bottomRight).x, tryposition.add(this.hitbox.bottomRight).y)) && pass.y) {
-        //     this.velocity.y = 0;
-        //     this.position.y = Math.round(this.position.y) - ((0.5 - EPSILON) - Math.abs(this.hitbox.bottomRight.y));
-        //     pass.y = false;
-        // }
-
-
-        // if (pass.x) this.position.x = tryposition.x;
-        // if (pass.y) this.position.y = tryposition.y;
     }
 }

@@ -8,7 +8,7 @@ export class Player extends Entity {
 
         this.hasPhysics = true;
 
-        this.hitbox = new HitBox(new Vector2(-0.35, -0.3), new Vector2(0.7, 0.7), [new Vector2(-0.35, -0.3), new Vector2(0.35, -0.3), new Vector2(-0.35, 0.4), new Vector2(0.35, 0.4)]);
+        this.hitbox = new HitBox(new Vector2(-0.38, -0.33), new Vector2(0.76, 0.76));
 
         this.max_speed = 4;
         this.acceleration = 0.09;

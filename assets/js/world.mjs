@@ -8,7 +8,7 @@ export class World {
         for (let y = 0; y < size.y; y++) {
             this.tiles[y] = [];
             for (let x = 0; x < size.x; x++) {
-                this.tiles[y][x] = Math.random() > 0.9 ? 1 : 0;
+                this.tiles[y][x] = Math.random() > 0.9 ? Math.ceil(Math.random() * 3) : 0;
             }
         }
 
