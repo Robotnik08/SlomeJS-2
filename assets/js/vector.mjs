@@ -53,11 +53,32 @@ export class Vector2 {
     }
 
     static interpolate (a, b, t) {
+        t = Math.max(0, Math.min(1, t));
         return new Vector2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
     }
 
     toVector3 () {
         return new Vector3(this.x, this.y, 0);
+    }
+
+    toString () {
+        return `Vec2(${this.x}, ${this.y})`;
+    }
+
+    round () {
+        return new Vector2(Math.round(this.x), Math.round(this.y));
+    }
+
+    floor () {
+        return new Vector2(Math.floor(this.x), Math.floor(this.y));
+    }
+
+    ceil () {
+        return new Vector2(Math.ceil(this.x), Math.ceil(this.y));
+    }
+
+    equals (vector) {
+        return this.x === vector.x && this.y === vector.y;
     }
 }
 
@@ -102,5 +123,25 @@ export class Vector3 {
 
     toVector2 () {
         return new Vector2(this.x, this.y);
+    }
+
+    toString () {
+        return `Vec3(${this.x}, ${this.y}, ${this.z})`;
+    }
+
+    round () {
+        return new Vector3(Math.round(this.x), Math.round(this.y), Math.round(this.z));
+    }
+
+    floor () {
+        return new Vector3(Math.floor(this.x), Math.floor(this.y), Math.floor(this.z));
+    }
+
+    ceil () {
+        return new Vector3(Math.ceil(this.x), Math.ceil(this.y), Math.ceil(this.z));
+    }
+
+    equals (vector) {
+        return this.x === vector.x && this.y === vector.y && this.z === vector.z;
     }
 }
