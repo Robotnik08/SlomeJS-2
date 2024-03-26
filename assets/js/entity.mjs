@@ -2,8 +2,10 @@ import { Vector2 } from "./vector.mjs";
 import { HitBox } from "./hitbox.mjs";
 import { EPSILON } from "./constants.mjs";
 
+let global_id = 1000;
+
 export class Entity {
-    constructor (position, sprite, size = null) {
+    constructor (position, sprite, size = null, id = null) {
         this.position = position;
         this.projectedPosition = position;
         this.sprite = sprite;
@@ -15,6 +17,8 @@ export class Entity {
         this.is_grounded = false;
 
         this.size = size ? size : Vector2.one;
+        
+        this.id = id || global_id++;
     }
 
     fixedUpdate () {

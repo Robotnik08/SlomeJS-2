@@ -17,12 +17,23 @@ const server = http.createServer(app);
 const io = new SocketServer(server);
 const serverInstance = new Server(io);
 
+// redirect to worlds/main
+app.get(['/worlds/', '/'], (req, res) => {
+    res.redirect('/worlds/main');
+});
+
 app.get('/worlds/:world', (req, res) => {
     res.sendFile('index.html', { root: path.join(__dirname, 'public') });
 });
 
 app.get('/socket.io/socket.io.js', (req, res) => {
     res.sendFile('socket.io.js', { root: path.join(__dirname, 'node_modules/socket.io/client-dist') });
+});
+
+// Route to prevent access to the server folder
+app.use('/:any*/server', (req, res) => {
+    // Respond with an access denied message
+    res.status(403).send('Access denied');
 });
 
 // js folder

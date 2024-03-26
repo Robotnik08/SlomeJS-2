@@ -35,7 +35,7 @@ export class Game {
         this.selectedTile = Vector2.zero;
         this.selectedType = 1;
 
-        time.subscribe((dt) => {
+        this.subscribeTimeEvent((dt) => {
             if (!this.world.loaded) return;
 
             this.draw(this.camera);
@@ -76,7 +76,7 @@ export class Game {
             input.keys_down = {};
         }, Time.mode.update);
 
-        time.subscribe(() => {
+        this.subscribeTimeEvent(() => {
             if (!this.world.loaded) return;
 
             this.entities.forEach(entity => {
@@ -88,6 +88,9 @@ export class Game {
         time.start();
     }
 
+    subscribeTimeEvent (callback, mode = Time.mode.update) {
+        time.subscribe(callback, mode);
+    }
     draw (camera = Vector2.zero) {
 
         const aspect_ratio = this.canvas.size.x / this.canvas.size.y;
@@ -126,7 +129,9 @@ export class Game {
         // draw selected tile
         this.canvas.drawRect(this.selectedTile.multiply(this.canvas.height * (1/this.zoom)).subtract(camera_pixel), new Vector2(this.canvas.height * (1/this.zoom) + 1, this.canvas.height * (1/this.zoom) + 1), new Color(255, 255, 255, 0.5));
 
-        for (const entity of this.entities) {
+        for (let i in this.entities) {
+            if (isNaN(i)) continue;
+            const entity = this.entities[this.entities.length - i - 1];
             const sprite = sprites.getSprite(entity.sprite);
             let position = entity.projectedPosition.multiply(this.canvas.height * (1/this.zoom));
             position = position.subtract(camera_pixel);

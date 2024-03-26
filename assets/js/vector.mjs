@@ -80,6 +80,10 @@ export class Vector2 {
     equals (vector) {
         return this.x === vector.x && this.y === vector.y;
     }
+
+    toObject () {
+        return { x: this.x, y: this.y };
+    }
 }
 
 export class Vector3 {
@@ -143,5 +147,9 @@ export class Vector3 {
 
     equals (vector) {
         return this.x === vector.x && this.y === vector.y && this.z === vector.z;
+    }
+
+    toObject () {
+        return { x: this.x, y: this.y, z: this.z };
     }
 }
