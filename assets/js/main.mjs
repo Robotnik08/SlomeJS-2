@@ -6,6 +6,10 @@ const instance = new Game();
 
 const client = new Client(instance);
 
+instance.setTile = (position, type, background = false) => {
+    client.sendChange(position, type, background);
+};
+
 instance.subscribeTimeEvent(() => {
     client.fixedUpdate();
 }, Time.fixedUpdate);

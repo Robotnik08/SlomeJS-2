@@ -35,6 +35,10 @@ export class Game {
         this.selectedTile = Vector2.zero;
         this.selectedType = 1;
 
+        this.max_tile_id = sprites.tiles.length;
+
+        this.setTile = null;
+
         this.subscribeTimeEvent((dt) => {
             if (!this.world.loaded) return;
 
@@ -60,16 +64,25 @@ export class Game {
                 if (this.zoom < this.zoomBounds.x) this.zoom = this.zoomBounds.x;
             }
 
+            if (input.getKeyDown('LeftControl')) {
+                this.selectedType = 0;
+            }
+
+            if (input.getKeyDown('KeyQ')) {
+                this.selectedType++;
+                if (this.selectedType > this.max_tile_id) this.selectedType = 0;
+            }
+
             if (input.getKeyDown('F3')) {
                 this.debug = !this.debug;
             }
 
             if (input.getKeyDown(Input.leftMouseButton) && this.world.getTile(this.selectedTile) === 0 && this.checkIfTileCollider(this.selectedTile) && this.world.checkPlacement(this.selectedTile)) {
-                this.world.setTile(this.selectedTile, this.selectedType);
+                this.setTile(this.selectedTile, this.selectedType);
             }
 
-            if (input.getKeyDown(Input.rightMouseButton)) {
-                this.world.setTile(this.selectedTile, this.selectedType, true);
+            if (input.getKeyDown(Input.rightMouseButton && this.world.getTile(this.selectedTile, true) === 0 && this.world.checkPlacement(this.selectedTile, true)) ) {
+                this.setTile(this.selectedTile, this.selectedType, true);
             }
 
 
@@ -91,6 +104,7 @@ export class Game {
     subscribeTimeEvent (callback, mode = Time.mode.update) {
         time.subscribe(callback, mode);
     }
+    
     draw (camera = Vector2.zero) {
 
         const aspect_ratio = this.canvas.size.x / this.canvas.size.y;
@@ -129,6 +143,7 @@ export class Game {
         // draw selected tile
         this.canvas.drawRect(this.selectedTile.multiply(this.canvas.height * (1/this.zoom)).subtract(camera_pixel), new Vector2(this.canvas.height * (1/this.zoom) + 1, this.canvas.height * (1/this.zoom) + 1), new Color(255, 255, 255, 0.5));
 
+
         for (let i in this.entities) {
             if (isNaN(i)) continue;
             const entity = this.entities[this.entities.length - i - 1];
@@ -138,6 +153,8 @@ export class Game {
 
             this.canvas.drawSprite(sprite, position, entity.size.multiply(this.canvas.height * (1/this.zoom)), 0);
         }
+
+        this.drawUI();
 
         const debug_text = document.getElementById('debug');
         debug_text.innerHTML = '';
@@ -150,6 +167,12 @@ export class Game {
             debug_text.innerHTML += 'Entities: ' + this.entities.length + '<br>';
             debug_text.innerHTML += 'Selected Tile: ' + this.selectedTile.toString() + '<br>';
         }
+    }
+
+    drawUI () {
+        // selected block
+        const sprite = sprites.getTile(this.selectedType);
+        this.canvas.drawSprite(sprite, new Vector2(10, 10), new Vector2(50, 50), 0, false);
     }
 
     checkIfTileCollider (position) {

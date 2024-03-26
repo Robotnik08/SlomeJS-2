@@ -19,8 +19,6 @@ export class Server {
 
         this.players.push(player);
 
-        console.log(socket.id);
-        console.log(this.players.length);
 
         socket.on('world', (data) => {
             if (!this.worlds[data]) {
@@ -31,6 +29,9 @@ export class Server {
             socket.emit('world', this.worlds[data].toPacket());
 
             player.connected_world = data;
+            socket.join(player.connected_world);
+
+            player.loaded = true;
         });
 
         socket.on('disconnect', () => {
@@ -38,8 +39,17 @@ export class Server {
         });
 
         socket.on('move', (data) => {
+            if (!player.loaded) return;
+
             player.position = new Vector2(data.x, data.y);
             socket.emit('playerdata', this.getPlayersFromWorld(player.connected_world, player.id));
+        });
+
+        socket.on('change', (data) => {
+            if (!player.loaded) return;
+
+            this.worlds[player.connected_world].setTile(new Vector2(data.x, data.y), data.type, data.background);
+            this.io.to(player.connected_world).emit('change', data);
         });
     }
 

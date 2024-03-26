@@ -7,7 +7,7 @@ export class Sprites {
         this.missing = new Sprite('img/game/tiles/MissingBlock.png');
 
         this.sprites = {
-
+            'pickaxe': 'img/game/items/iron_pickaxe.png',
             'slome': 'img/game/character/slome.png'
         };
 
@@ -58,6 +58,8 @@ export class Sprites {
     }
 
     getTile(index, dark = false) {
+        if (index == 0) return this.sprites.pickaxe;
+
         return (dark ? this.dark_tiles : this.tiles)[index - 1] ? (dark ? this.dark_tiles : this.tiles)[index - 1] : this.missing;
     }
 }

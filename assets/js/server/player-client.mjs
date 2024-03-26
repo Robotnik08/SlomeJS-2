@@ -10,5 +10,7 @@ export class PlayerClient {
         this.socket = socket;
 
         this.id = socket.id;
+
+        this.loaded = false;
     }
 }

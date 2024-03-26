@@ -39,6 +39,10 @@ export class Client {
                 return false;
             });
         });
+
+        socket.on('change', (data) => {
+            this.game.world.setTile(new Vector2(data.x, data.y), data.type, data.background);
+        });
         
 
         // ask for world
@@ -55,5 +59,9 @@ export class Client {
     getWorld (data) {
         this.game.world.fromPacket(data);
         this.game.entities[0].position = this.game.world.getSpawn();
+    }
+
+    sendChange (position, type, background = false) {
+        socket.emit('change', { x: position.x, y: position.y, type: type, background: background });
     }
 }
