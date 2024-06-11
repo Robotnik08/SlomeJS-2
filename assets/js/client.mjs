@@ -52,13 +52,13 @@ export class Client {
     fixedUpdate () {
         // 20 tps
         if (tick++ % 3 === 0) {
-            socket.emit('move', this.game.entities[0].position);
+            socket.emit('move', this.game.player.position);
         }
     }
 
     getWorld (data) {
         this.game.world.fromPacket(data);
-        this.game.entities[0].position = this.game.world.getSpawn();
+        this.game.player.position = this.game.world.getSpawn();
     }
 
     sendChange (position, type, background = false) {

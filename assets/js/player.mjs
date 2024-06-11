@@ -13,6 +13,9 @@ export class Player extends Entity {
         this.max_speed = 4;
         this.acceleration = 0.09;
         this.jumpStrength = 12;
+
+        this.selectedType = 1;
+        this.angle = 0;
     }
 
     move (input, dt) {

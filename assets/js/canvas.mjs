@@ -30,16 +30,18 @@ export class Canvas {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    drawSprite (sprite, position, size, rotation = false, center_origin = true) {
+    drawSprite (sprite, position, size, rotation = false, center_origin = true, translation = new Vector2(0, 0), flipX = false, flipY = false) {
 
         if (rotation) {
             this.context.save();
             this.context.translate(position.x, position.y);
+            this.context.scale(flipX ? -1 : 1, flipY ? -1 : 1);
+            rotation = flipX ? -rotation + 180 : rotation;
             this.context.rotate(rotation * Math.PI / 180);
             this.context.drawImage(
                 sprite.image,
-                - (center_origin ? size.x / 2 : 0),
-                - (center_origin ? size.x / 2 : 0),
+                - (center_origin ? size.x / 2 : 0) + translation.x,
+                - (center_origin ? size.x / 2 : 0) + translation.y,
                 size.x,
                 size.y
             );
