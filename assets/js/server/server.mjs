@@ -41,7 +41,9 @@ export class Server {
         socket.on('move', (data) => {
             if (!player.loaded) return;
 
-            player.position = new Vector2(data.x, data.y);
+            player.position = new Vector2(data.pos.x, data.pos.y);
+            player.angle = data.angle;
+            player.selectedType = data.selectedType;
             socket.emit('playerdata', this.getPlayersFromWorld(player.connected_world, player.id));
         });
 
@@ -59,6 +61,8 @@ export class Server {
             result[i] = {
                 id: result[i].id,
                 position: result[i].position.toObject(),
+                angle: result[i].angle,
+                selectedType: result[i].selectedType,
                 name: result[i].name
             };
         }

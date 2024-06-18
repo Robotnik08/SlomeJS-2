@@ -35,8 +35,6 @@ export class Game {
 
         this.selectedTile = Vector2.zero;
 
-        this.max_tile_id = sprites.tiles.length;
-
         this.setTile = null;
 
         this.subscribeTimeEvent((dt) => {
@@ -70,9 +68,21 @@ export class Game {
                 this.player.selectedType = 0;
             }
 
-            if (input.getKeyDown('KeyQ')) {
+            
+            // hotbarselect
+            for (let i = 1; i <= 10; i++) {
+                if (input.getKey('Digit' + (i % 10)) && i - 1 <= sprites.max_tile_id) {
+                    this.player.selectedType = i - 1;
+                }
+            }
+
+            if (input.scroll > 0) {
                 this.player.selectedType++;
-                if (this.player.selectedType > this.max_tile_id) this.player.selectedType = 0;
+                if (this.player.selectedType > sprites.max_tile_id) this.player.selectedType = 0;
+            }
+            if (input.scroll < 0) {
+                this.player.selectedType--;
+                if (this.player.selectedType < 0) this.player.selectedType = sprites.max_tile_id;
             }
 
             if (input.getKeyDown('F3')) {
@@ -94,6 +104,7 @@ export class Game {
 
 
             input.keys_down = {};
+            input.scroll = 0;
         }, Time.mode.update);
 
         this.subscribeTimeEvent(() => {
@@ -161,7 +172,7 @@ export class Game {
             this.canvas.drawSprite(sprite, position, entity.size.multiply(this.canvas.height * (1/this.zoom)), 0);
 
             // draw tile in hand
-            if (entity.selectedType && entity.angle) {
+            if (entity.IS_PLAYER || entity.IS_OTHER_PLAYER) {
                 const hand_sprite = sprites.getTile(entity.selectedType);
                 this.canvas.drawSprite(
                     hand_sprite, 
@@ -178,7 +189,7 @@ export class Game {
         this.drawUI();
 
         const debug_text = document.getElementById('debug');
-        debug_text.innerHTML = '';
+        debug_text.innerHTML = 'SlomeJS v0.1<br>';
 
         if (this.debug) {
 
@@ -193,7 +204,29 @@ export class Game {
     drawUI () {
         // selected block
         const sprite = sprites.getTile(this.player.selectedType);
-        this.canvas.drawSprite(sprite, new Vector2(10, 10), new Vector2(50, 50), 0, false);
+        const size = Vector2.one.multiply(this.canvas.height).divide(10);
+        this.canvas.drawSprite(sprite, new Vector2(this.canvas.width - size.x - size.divide(4).x, size.divide(4).y), size, 0, false);
+
+        // hotbar
+        const hotbar = sprites.getSprite('hotbar');
+        const hotbar_size = hotbar.size.normalize().multiply(this.canvas.height);
+        this.canvas.drawSprite(hotbar, new Vector2(this.canvas.width / 2 - hotbar_size.x / 2, this.canvas.height*0.99 - hotbar_size.y), hotbar_size, 0, false);
+
+        const hotbar_start_offset = new Vector2(this.canvas.width / 1.896 - hotbar_size.x / 2, this.canvas.height*0.99 - hotbar_size.y + hotbar_size.y/2);
+        // draw each item id in hotbar
+        for (let i = 0; i < sprites.max_tile_id + 1; i++) {
+            const sprite = sprites.getTile(i);
+            const size = Vector2.one.multiply(this.canvas.height).divide(17);
+            const position = hotbar_start_offset.add(new Vector2(size.x * i + i * size.x/1.51, 0));
+            this.canvas.drawSprite(sprite, position, size, 0, true);
+
+            if (this.player.selectedType % 10 == i) {
+                this.canvas.drawSprite(sprites.getSprite('hotbar_select'), position.subtract(size.multiply(1.6).divide(2)), size.multiply(1.57), 0, false)
+            }
+
+            // draw hotbar number
+            this.canvas.drawText((i + 1) % 10, position.subtract(new Vector2(size.x/1.4, size.y/2.2)), size.y/2.8, Color.white)
+        }
     }
 
     checkIfTileCollider (position) {

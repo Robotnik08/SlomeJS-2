@@ -3,6 +3,7 @@ import { Vector2 } from "./vector.mjs";
 export class Input {
     constructor () {
         this.mouse = Vector2.zero;
+        this.scroll = 0;
         this.keys = {};
         this.keys_down = {};
 
@@ -22,6 +23,10 @@ export class Input {
         window.addEventListener('mousemove', event => {
             this.mouse.x = event.clientX;
             this.mouse.y = event.clientY;
+        });
+
+        window.addEventListener('wheel', event => {
+            this.scroll = event.deltaY;
         });
 
         window.addEventListener('keydown', event => {

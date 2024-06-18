@@ -77,6 +77,13 @@ export class Vector2 {
         return new Vector2(Math.ceil(this.x), Math.ceil(this.y));
     }
 
+    normalize () {
+        const magnitude = this.magnitude;
+        this.x /= magnitude;
+        this.y /= magnitude;
+        return this;
+    }
+
     equals (vector) {
         return this.x === vector.x && this.y === vector.y;
     }

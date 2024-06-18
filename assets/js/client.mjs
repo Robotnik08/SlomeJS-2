@@ -22,6 +22,8 @@ export class Client {
                 this.game.entities.forEach(entity => {
                     if (entity.id === player.id) {
                         entity.position = new Vector2(player.position.x, player.position.y);
+                        entity.angle = player.angle;
+                        entity.selectedType = player.selectedType;
                         found = true;
                     }
                 });
@@ -31,7 +33,7 @@ export class Client {
 
             // remove players that are not in the list
             this.game.entities = this.game.entities.filter(entity => {
-                if (!entity.multi_ghost) return true;
+                if (!entity.IS_OTHER_PLAYER) return true;
 
                 for (const player of data) {
                     if (entity.id === player.id) return true;
@@ -52,7 +54,11 @@ export class Client {
     fixedUpdate () {
         // 20 tps
         if (tick++ % 3 === 0) {
-            socket.emit('move', this.game.player.position);
+            socket.emit('move', {
+                pos: this.game.player.position,
+                angle: this.game.player.angle,
+                selectedType: this.game.player.selectedType
+            });
         }
     }
 

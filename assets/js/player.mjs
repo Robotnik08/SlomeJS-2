@@ -3,6 +3,9 @@ import { Vector2 } from './vector.mjs';
 import { HitBox } from './hitbox.mjs';
 
 export class Player extends Entity {
+    
+    IS_PLAYER = true;
+
     constructor (position, sprite, size) {
         super(position, sprite, size);
 
@@ -14,7 +17,7 @@ export class Player extends Entity {
         this.acceleration = 0.09;
         this.jumpStrength = 12;
 
-        this.selectedType = 1;
+        this.selectedType = 0;
         this.angle = 0;
     }
 

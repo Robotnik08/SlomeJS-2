@@ -4,18 +4,28 @@ import { Vector2 } from "./vector.mjs";
 export class Sprites {
     constructor () {
 
-        this.missing = new Sprite('img/game/tiles/MissingBlock.png');
+        this.missing = new Sprite('img/game/tiles/missing_block.png');
 
         this.sprites = {
             'pickaxe': 'img/game/items/iron_pickaxe.png',
-            'slome': 'img/game/character/slome.png'
+            'slome': 'img/game/character/slome.png',
+            'hotbar': 'img/game/ui/hotbar.png',
+            'hotbar_select': 'img/game/ui/hotbar_select.png'
         };
 
         this.tiles = [
             'img/game/tiles/grass.png',
             'img/game/tiles/dirt.png',
             'img/game/tiles/stone.png',
+            'img/game/tiles/coal_ore.png',
+            'img/game/tiles/iron_ore.png',
+            'img/game/tiles/oak_log.png',
+            'img/game/tiles/oak_leaves.png',
+            'img/game/tiles/oak_planks.png',
+            'img/game/tiles/cobbled_stone.png',
         ];
+
+        this.max_tile_id = this.tiles.length;
 
         this.dark_tiles = [];
 

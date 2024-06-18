@@ -65,7 +65,7 @@ export class Canvas {
             this.context.translate(position.x, position.y);
             this.context.rotate(rotation * Math.PI / 180);
             this.context.font = `${size}px sans-serif`;
-            this.context.fillStyle = text.color.toRGBA();
+            this.context.fillStyle = color.toRGBA();
             this.context.fillText(text, 0, 0);
             this.context.restore();
             return;
