@@ -191,7 +191,7 @@ export class Game {
         this.drawUI();
 
         const debug_text = document.getElementById('debug');
-        debug_text.innerHTML = 'SlomeJS v0.1<br>';
+        debug_text.innerHTML = 'SlomeJS v0.2<br>';
 
         if (this.debug) {
 
