@@ -16,6 +16,7 @@ export class World {
     getTile (position, background = false) {
         position.x = Math.floor(position.x);
         position.y = Math.floor(position.y);
+        if (position.x < 0 || position.x >= this.size.x || position.y < 0 || position.y >= this.size.y) return 0;
         return (background ? this.background_tiles : this.tiles)[position.y][position.x] ? (background ? this.background_tiles : this.tiles)[position.y][position.x] : 0;
     }
 
@@ -24,6 +25,7 @@ export class World {
 
         position.x = Math.floor(position.x);
         position.y = Math.floor(position.y);
+        if (position.x < 0 || position.x >= this.size.x || position.y < 0 || position.y >= this.size.y) return;
         (background ? this.background_tiles : this.tiles)[position.y][position.x] = value;
     }
 
@@ -65,5 +67,22 @@ export class World {
         this.size = packet.size;
 
         this.loaded = true;
+    }
+
+    getJSON () {
+        return JSON.stringify({
+            tiles: this.tiles,
+            background_tiles: this.background_tiles,
+            size: this.size
+        });
+    }
+
+    static fromJSON (json) {
+        const data = JSON.parse(json);
+        const world = new World(data.size);
+        world.tiles = data.tiles;
+        world.background_tiles = data.background_tiles;
+
+        return world;
     }
 }

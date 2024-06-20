@@ -144,17 +144,19 @@ export class Game {
         for (let x = Math.max(0, camera.x - Math.round(unit_camera_size.x / 2 + 2)); x < Math.min(this.world.size.x, camera.x + Math.round(unit_camera_size.x / 2 + 2)); x++) {
             for (let y = Math.max(0, camera.y - Math.round(unit_camera_size.y / 2 + 2)); y < Math.min(this.world.size.y, camera.y + Math.round(unit_camera_size.y / 2 + 2)); y++) {
                 const position = new Vector2(x, y);
+                
+                if (!this.world.getTile(position) || sprites.is_transparent[this.world.getTile(position)]) {
+                    if (this.world.getTile(position, true)) {
+                        const sprite = sprites.getTile(this.world.getTile(position, true), true);
+                        this.canvas.drawSprite(sprite, position.multiply(this.canvas.height * (1/this.zoom)).subtract(camera_pixel), new Vector2(this.canvas.height * (1/this.zoom) + 1, this.canvas.height * (1/this.zoom) + 1), false, false);
+                    }
+                }
 
-                if (!this.world.getTile(position)) {
-                    if (!this.world.getTile(position, true)) continue;
-
-                    const sprite = sprites.getTile(this.world.getTile(position, true), true);
+                if (this.world.getTile(position)) {
+                    const sprite = sprites.getTile(this.world.getTile(position));
                     this.canvas.drawSprite(sprite, position.multiply(this.canvas.height * (1/this.zoom)).subtract(camera_pixel), new Vector2(this.canvas.height * (1/this.zoom) + 1, this.canvas.height * (1/this.zoom) + 1), false, false);
-                    continue;
-                };
+                }
 
-                const sprite = sprites.getTile(this.world.getTile(position));
-                this.canvas.drawSprite(sprite, position.multiply(this.canvas.height * (1/this.zoom)).subtract(camera_pixel), new Vector2(this.canvas.height * (1/this.zoom) + 1, this.canvas.height * (1/this.zoom) + 1), false, false);
             }
         }
 

@@ -2,6 +2,7 @@ import { World } from "../world.mjs";
 import { Vector2 } from "../vector.mjs";
 import { generate } from "./generator.mjs";
 import { PlayerClient } from "./player-client.mjs";
+import { SaveManager } from "./save-manager.mjs";
 
 export class Server {
     constructor (io) {
@@ -12,6 +13,7 @@ export class Server {
 
         this.io.on('connection', this.userSocket.bind(this));
 
+        this.saveManager = new SaveManager();
     }
 
     userSocket (socket) {
@@ -22,19 +24,33 @@ export class Server {
 
         socket.on('world', (data) => {
             if (!this.worlds[data]) {
-                this.worlds[data] = new World(new Vector2(1000, 500));
-                generate(this.worlds[data]);
+                this.saveManager.loadWorld(data).then(world => {
+                    if (world === null) {
+                        this.worlds[data] = new World(new Vector2(1000, 500));
+                        generate(this.worlds[data]);
+                    } else {
+                        this.worlds[data] = world;
+                    }
+
+                    socket.emit('world', this.worlds[data].toPacket());
+
+                    player.connected_world = data;
+                    socket.join(player.connected_world);
+
+                    player.loaded = true;
+                });
+            } else {
+                socket.emit('world', this.worlds[data].toPacket());
+    
+                player.connected_world = data;
+                socket.join(player.connected_world);
+    
+                player.loaded = true;
             }
-
-            socket.emit('world', this.worlds[data].toPacket());
-
-            player.connected_world = data;
-            socket.join(player.connected_world);
-
-            player.loaded = true;
         });
 
         socket.on('disconnect', () => {
+            if (this.worlds[player.connected_world] != null) this.saveManager.saveWorld(this.worlds[player.connected_world], player.connected_world);
             this.players.splice(this.players.indexOf(player), 1);
         });
 

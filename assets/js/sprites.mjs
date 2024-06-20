@@ -17,12 +17,26 @@ export class Sprites {
             'img/game/tiles/grass.png',
             'img/game/tiles/dirt.png',
             'img/game/tiles/stone.png',
-            'img/game/tiles/coal_ore.png',
-            'img/game/tiles/iron_ore.png',
             'img/game/tiles/oak_log.png',
             'img/game/tiles/oak_leaves.png',
             'img/game/tiles/oak_planks.png',
             'img/game/tiles/cobbled_stone.png',
+            'img/game/tiles/glass.png',
+            'img/game/tiles/bedrock.png',
+        ];
+
+
+        this.is_transparent = [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
         ];
 
         this.max_tile_id = this.tiles.length;
