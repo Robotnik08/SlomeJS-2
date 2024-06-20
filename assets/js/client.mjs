@@ -10,6 +10,24 @@ export class Client {
     constructor (game_instance) {
         this.game = game_instance;
 
+        // send to /kicked if disconnected
+        socket.on('disconnect', () => {
+            window.location.href = '/kicked';
+        });
+
+        socket.on('error', (data) => {
+            switch (data) {
+                case 'World not found':
+                    window.location.href = '/world-not-found';
+                    break;
+                case 'You are not whitelisted for this world':
+                    window.location.href = '/not-whitelisted';
+                    break;
+                default:
+                    console.error(data);
+                    break;
+            }
+        });
 
         // init receive
         socket.on('world', this.getWorld.bind(this));

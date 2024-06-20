@@ -3,16 +3,54 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Slome JS</title>
+        <title>Slome JS | Home</title>
         <link rel="stylesheet" href="css/styles.css">
-        <script src="js/main.mjs" type="module" defer></script>
     </head>
     <body>
-        <main id="gui">
-
-        </main>
-        <div id="debug">
+        <main id="home">
+            <h1>Slome JS</h1>
+            <p>Slome JS is an online multiplayer sandbox game.</p>
             
-        </div>
+            <div id="user-data">
+            </div>
+
+            <div id="worlds">
+                <h2>Your World</h2>
+                <a id="world-link" href="/worlds/main">Join</a>
+
+                <h2>Online Worlds</h2>
+
+                <label for="world-name">Join a world</label>
+                <input type="text" id="world-name" placeholder="World name">
+                <input type="button" value="Join World" onclick="joinWorld()">
+            </div>
+        </main>
+
+        <script>
+            function joinWorld() {
+                const worldName = document.getElementById('world-name').value;
+                window.location.href = `/worlds/${worldName}`;
+            }
+
+            fetch('/session').then(response => response.json()).then(data => {
+                const userData = document.getElementById('user-data');
+                if (!data.username) {
+                    userData.innerHTML = `<h2>You need to have an account to play!</h2>`;
+                    userData.innerHTML += `<a href="/login">Login</a>`;
+                    userData.innerHTML += `<a href="/register">Register</a>`;
+
+                    // hide the world link
+                    document.getElementById('worlds').style.display = 'none';
+                } else {
+                    userData.innerHTML = `<p>You are logged in as: ${data.username}!</p>`;
+                    userData.innerHTML += `<a href="/logout">Logout</a>`;
+
+                    // show the world link
+                    document.getElementById('world-link').href = `/worlds/${data.username}`;
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        </script>
     </body>
 </html>

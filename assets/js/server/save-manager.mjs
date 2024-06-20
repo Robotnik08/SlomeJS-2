@@ -12,7 +12,16 @@ export class SaveManager {
         await main_db.execute(checkQuery).then((results) => {
             if (results.length == 0) {
                 const query = `INSERT INTO worlds (name, data) VALUES ('${name}', '${JSON.stringify(world.getJSON())}')`;
-                main_db.execute(query);
+                // return id after insert
+                main_db.execute(query).then((results) => {
+                    // get account id
+                    const query = `SELECT * FROM accounts WHERE name='${name}'`;
+                    main_db.execute(query).then((accounts) => {
+                        const id = accounts[0].id;
+                        // link world to account
+                        this.linkWorld(results.insertId, id);
+                    });
+                });
             } else {
                 const query = `UPDATE worlds SET name='${name}', data='${JSON.stringify(world.getJSON())}' WHERE name='${name}'`;
                 main_db.execute(query);
@@ -28,6 +37,23 @@ export class SaveManager {
             return null;
         }
         const json = result[0].data.toString().slice(1, -1);
-        return World.fromJSON(json);
+        return World.fromJSON(json, result[0].id);
+    }
+
+    async linkWorld (id, owner) {
+        const query = `INSERT INTO accounts_worlds (world_id, account_id) VALUES ('${id}', '${owner}')`;
+        main_db.execute(query);
+    }
+
+    async getWorld (owner) {
+        const query = `SELECT * FROM accounts_worlds WHERE account_id = '${owner}'`;
+        const results = await main_db.execute(query);
+        return results.length === 1 ? results[0] : results;
+    }
+
+    async getOwner (id) {
+        const query = `SELECT * FROM accounts_worlds WHERE world_id = '${id}'`;
+        const results = await main_db.execute(query);
+        return results.length === 1 ? results[0] : results;
     }
 }

@@ -195,11 +195,12 @@ export class Game {
 
         if (this.debug) {
 
-            debug_text.innerHTML += 'FPS: ' + time.fps + '<br>';
-            debug_text.innerHTML += 'Position: ' + this.player.projectedPosition.toString() + '<br>';
-            debug_text.innerHTML += 'Zoom: ' + this.zoom + '<br>';
+            debug_text.innerHTML += 'FPS: ' + Math.round(time.fps) + '<br>';
+            debug_text.innerHTML += 'Position: ' + this.player.projectedPosition.toFixed(2).toString() + '<br>';
+            debug_text.innerHTML += 'Zoom: ' + this.zoom.toFixed(2) + '<br>';
             debug_text.innerHTML += 'Entities: ' + this.entities.length + '<br>';
             debug_text.innerHTML += 'Selected Tile: ' + this.selectedTile.toString() + '<br>';
+            debug_text.innerHTML += 'Name: ' + this.player.name + '<br>';
         }
     }
 

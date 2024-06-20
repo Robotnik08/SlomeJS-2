@@ -17,41 +17,101 @@ export class Server {
     }
 
     userSocket (socket) {
+        if (!socket.request.session || !socket.request.session.user) {
+            console.log('Unauthorized user tried to connect');
+            socket.disconnect(true);
+            return;
+        }
+
+        const username = socket.request.session.user;
+        const userId = socket.id;
+
         const player = new PlayerClient(socket);
+        player.name = username;
+
+        for (let i = 0; i < this.players.length; i++) {
+            if (this.players[i].name === player.name) {
+                this.players[i].socket.disconnect(true);
+                this.players.splice(i, 1);
+                break;
+            }
+        }
 
         this.players.push(player);
 
+        console.log(`<${player.name}> connected`);
 
         socket.on('world', (data) => {
+            if (player.loaded) return;
+
             if (!this.worlds[data]) {
                 this.saveManager.loadWorld(data).then(world => {
                     if (world === null) {
-                        this.worlds[data] = new World(new Vector2(1000, 500));
+                        // only the owner of the world can generate it
+                        if (player.name !== data) {
+                            socket.emit('error', 'World not found');
+                            return;
+                        }
+                        this.worlds[data] = new World(new Vector2(300, 200));
                         generate(this.worlds[data]);
+
+                        this.saveManager.saveWorld(this.worlds[data], data);
+
+                        socket.emit('world', this.worlds[data].toPacket());
+    
+                        player.connected_world = data;
+                        socket.join(player.connected_world);
+                        console.log(`<${player.name}> joined world <${data}>`);
+    
+                        player.loaded = true;
                     } else {
                         this.worlds[data] = world;
+
+                        // check if the player is allowed to join the world (whitelist or owner)
+                        this.saveManager.getOwner(world.id).then(link_data => {
+                            const whitelist_on = link_data.whitelist_on;
+                            const whitelist = link_data.whitelist.split(',');
+                            if (player.name !== data && (whitelist.indexOf(player.name) === -1 && whitelist_on)) {
+                                socket.emit('error', 'You are not whitelisted for this world');
+                                return;
+                            }
+
+                            socket.emit('world', this.worlds[data].toPacket());
+        
+                            player.connected_world = data;
+                            socket.join(player.connected_world);
+                            console.log(`<${player.name}> joined world <${data}>`);
+        
+                            player.loaded = true;
+                        });
+
+                    }
+                });
+            } else {
+                // check if the player is allowed to join the world (whitelist or owner)
+                this.saveManager.getOwner(this.worlds[data].id).then(link_data => {
+                    const whitelist_on = link_data.whitelist_on;
+                    const whitelist = link_data.whitelist.split(',');
+                    if (player.name !== data && (whitelist.indexOf(player.name) === -1 && whitelist_on)) {
+                        socket.emit('error', 'You are not whitelisted for this world');
+                        return;
                     }
 
                     socket.emit('world', this.worlds[data].toPacket());
 
                     player.connected_world = data;
                     socket.join(player.connected_world);
+                    console.log(`<${player.name}> joined world <${data}>`);
 
                     player.loaded = true;
                 });
-            } else {
-                socket.emit('world', this.worlds[data].toPacket());
-    
-                player.connected_world = data;
-                socket.join(player.connected_world);
-    
-                player.loaded = true;
             }
         });
 
         socket.on('disconnect', () => {
             if (this.worlds[player.connected_world] != null) this.saveManager.saveWorld(this.worlds[player.connected_world], player.connected_world);
             this.players.splice(this.players.indexOf(player), 1);
+            console.log(`<${player.name}> disconnected`);
         });
 
         socket.on('move', (data) => {

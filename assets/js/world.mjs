@@ -11,6 +11,8 @@ export class World {
         this.gravity = 9.81 * 2;
 
         this.loaded = false;
+
+        this.id = 0;
     }
 
     getTile (position, background = false) {
@@ -77,12 +79,13 @@ export class World {
         });
     }
 
-    static fromJSON (json) {
+    static fromJSON (json, id = 0) {
         const data = JSON.parse(json);
         const world = new World(data.size);
         world.tiles = data.tiles;
         world.background_tiles = data.background_tiles;
 
+        world.id = id;
         return world;
     }
 }

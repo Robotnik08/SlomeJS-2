@@ -91,6 +91,10 @@ export class Vector2 {
     toObject () {
         return { x: this.x, y: this.y };
     }
+
+    toFixed (n) {
+        return new Vector2(this.x.toFixed(n), this.y.toFixed(n));
+    }
 }
 
 export class Vector3 {

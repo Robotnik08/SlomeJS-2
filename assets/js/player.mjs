@@ -19,6 +19,13 @@ export class Player extends Entity {
 
         this.selectedType = 0;
         this.angle = 0;
+
+        this.name = "Player";
+
+        fetch('/session').then(res => res.json()).then(data => {
+            if (data.username)
+                this.name = data.username;
+        });
     }
 
     move (input, dt) {
