@@ -1,0 +1,7 @@
+config.js
+ignore.*
+*.ignore
+node_modules
+.vscode
+DS_Store
+.venv
