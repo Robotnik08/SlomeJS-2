@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import http from 'http';
 import { Server as SocketServer } from 'socket.io';
-import { config } from 'config.js';
+import { server_config } from './config.js';
 
 import { Server } from './assets/js/server/server.mjs';
 
@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 
 
 const app = express();
-const port = config.port || 2020;
+const port = server_config.port || 2020;
 
 const server = http.createServer(app);
 const io = new SocketServer(server);

@@ -1,13 +1,13 @@
 import mysql from 'mysql2';
-import { config } from './config.mjs';
+import { database_config } from '../../../config.js';
 
 export class DataBase {
     constructor () {
-        this.host = config.database.host;
-        this.user = config.database.user;
-        this.password = config.database.password;
-        this.database = config.database.database_name;
-        this.port = config.database.port;
+        this.host = database_config.host;
+        this.user = database_config.user;
+        this.password = database_config.password;
+        this.database = database_config.database_name;
+        this.port = database_config.port;
 
         this.connection = mysql.createConnection({
             host: this.host,
