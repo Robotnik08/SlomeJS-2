@@ -10,9 +10,11 @@ Make sure you have Node.js installed on your machine. Then run the following com
 npm i
 ```
 
-Then, to initialize the database, import the `worlds.sql` file into your MySQL database. You can do this by running the following command in the root directory of the project:
+Then, to initialize the database, import the sql files in the `sql` directory into your MySQL database. You can do this by running the following command in the root directory of the project:
 ```bash
-mysql -u <username> -p <database_name> < worlds.sql
+mysql -u <username> -p <database_name> < sql/accounts.sql
+mysql -u <username> -p <database_name> < sql/worlds.sql
+mysql -u <username> -p <database_name> < sql/accounts_worlds.sql # these are the relations between accounts and worlds must be imported last
 ```
 
 Finally, for bigger worlds, you must change the `max_allowed_packet` variable in your MySQL configuration file. Make sure it's above 2MB for larger worlds. (might need to be bigger for even larger worlds)<br>
