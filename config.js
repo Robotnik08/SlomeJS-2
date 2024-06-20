@@ -11,5 +11,5 @@ export const server_config = {
     secure: false,
     ssl_key: '',
     ssl_cert: '',
-    session_secret: '2u4bgf3rbvuq93uubgv8w3whonjdcvo8esjfvonibu934u'
+    session_secret: 'secret'
 };
