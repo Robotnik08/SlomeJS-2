@@ -1,10 +1,10 @@
 module.exports = {
-    db: {
+    database: {
         host: 'localhost',
         user: 'root',
         password: '',
         port: 27017,
-        db_name: 'test'
+        database_name: 'test'
     },
     server: {
         port: 2020
