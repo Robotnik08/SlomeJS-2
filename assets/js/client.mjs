@@ -1,6 +1,7 @@
-import { io } from 'https://cdn.socket.io/4.3.0/socket.io.esm.min.js';
+import { io } from '/socket.io.js';
 import { Vector2 } from './vector.mjs';
 import { OtherPlayer } from './other-player.mjs';
+import { ChatMessage } from './chat.mjs';
 
 const socket = io();
 
@@ -27,6 +28,10 @@ export class Client {
                     console.error(data);
                     break;
             }
+        });
+
+        socket.on('chat', (data) => {
+            this.game.chat.addMessage(new ChatMessage(data.author, data.message));
         });
 
         // init receive
@@ -67,6 +72,10 @@ export class Client {
 
         // ask for world
         socket.emit('world', window.location.pathname.split('/').pop());
+    }
+
+    sendChat (message) {
+        socket.emit('chat', message);
     }
 
     fixedUpdate () {

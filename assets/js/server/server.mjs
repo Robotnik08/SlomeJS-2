@@ -41,6 +41,13 @@ export class Server {
 
         console.log(`<${player.name}> connected`);
 
+
+        this.io.emit('chat', {author: null, message: username + ' has joined the world!'});
+
+        socket.on('chat', (data) => {
+            this.io.emit('chat', {author: username, message: data});
+        });
+        
         socket.on('world', (data) => {
             if (player.loaded) return;
 
@@ -69,11 +76,13 @@ export class Server {
 
                         // check if the player is allowed to join the world (whitelist or owner)
                         this.saveManager.getOwner(world.id).then(link_data => {
-                            const whitelist_on = link_data.whitelist_on;
-                            const whitelist = link_data.whitelist.split(',');
-                            if (player.name !== data && (whitelist.indexOf(player.name) === -1 && whitelist_on)) {
-                                socket.emit('error', 'You are not whitelisted for this world');
-                                return;
+                            if (link_data.whitelist != null) {
+                                const whitelist_on = link_data.whitelist_on;
+                                const whitelist = link_data.whitelist.split(',');
+                                if (player.name !== data && (whitelist.indexOf(player.name) === -1 && whitelist_on)) {
+                                    socket.emit('error', 'You are not whitelisted for this world');
+                                    return;
+                                }
                             }
 
                             socket.emit('world', this.worlds[data].toPacket());
@@ -90,11 +99,13 @@ export class Server {
             } else {
                 // check if the player is allowed to join the world (whitelist or owner)
                 this.saveManager.getOwner(this.worlds[data].id).then(link_data => {
-                    const whitelist_on = link_data.whitelist_on;
-                    const whitelist = link_data.whitelist.split(',');
-                    if (player.name !== data && (whitelist.indexOf(player.name) === -1 && whitelist_on)) {
-                        socket.emit('error', 'You are not whitelisted for this world');
-                        return;
+                    if (link_data.whitelist != null) {
+                        const whitelist_on = link_data.whitelist_on;
+                        const whitelist = link_data.whitelist.split(',');
+                        if (player.name !== data && (whitelist.indexOf(player.name) === -1 && whitelist_on)) {
+                            socket.emit('error', 'You are not whitelisted for this world');
+                            return;
+                        }
                     }
 
                     socket.emit('world', this.worlds[data].toPacket());

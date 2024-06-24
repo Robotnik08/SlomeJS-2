@@ -52,7 +52,7 @@ export class World {
             }
         }
         console.warn("No spawn found.");
-        return new Vector2(Math.round(this.size / 2), 1);
+        return new Vector2(0, 1);
     }
 
     toPacket () {

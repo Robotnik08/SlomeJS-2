@@ -4,25 +4,27 @@ import { Sprites } from './sprites.mjs';
 import { Sprite } from './sprite.mjs';
 import { Color } from './color.mjs';
 import { Time } from './time.mjs';
-import { Vector2, Vector3 } from './vector.mjs';
+import { Vector2 } from './vector.mjs';
 import { Player } from './player.mjs';
 import { World } from './world.mjs';
+import { Chat } from './chat.mjs';
 
 const time = new Time();
 const input = new Input();
 const sprites = new Sprites();
 
 export class Game {
-    constructor () {
+    constructor (client) {
         this.canvas = new Canvas(new Vector2(800, 600));
         this.canvas.autoResize = true;
         this.canvas.fitScreen();
 
 
+
         this.camera = new Vector2(0, 0);
         this.zoom = 14; // 2 = 50% zoom, 1 game unit is half the height of the screen
 
-        this.zoomBounds = new Vector2(4, 40);
+        this.zoomBounds = new Vector2(4, 30);
 
         this.entities = [];
 
@@ -30,7 +32,7 @@ export class Game {
 
         this.entities.push(new Player(Vector2.zero, 'slome', new Vector2 (0.88, 0.88)));
         this.player = this.entities[0];
-        // this.entities[0].position = this.world.getSpawn();
+
         this.player.projectedPosition = this.player.position;
 
         this.selectedTile = Vector2.zero;
@@ -99,8 +101,6 @@ export class Game {
             } else if (input.getKeyDown(Input.leftMouseButton)) {
                 this.setTile(this.selectedTile, 0, this.world.getTile(this.selectedTile) === 0);
             }
-
-            
 
 
             input.keys_down = {};

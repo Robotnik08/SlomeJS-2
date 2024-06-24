@@ -126,8 +126,8 @@ app.get('/worlds/:world', isAuthenticated, (req, res) => {
     res.sendFile('game.html', { root: path.join(__dirname, 'public') });
 });
 
-app.get('/socket.io/socket.io.js', (req, res) => {
-    res.sendFile('socket.io.js', { root: path.join(__dirname, 'node_modules/socket.io/client-dist') });
+app.get('/socket.io.js', (req, res) => {
+    res.sendFile('socket.io.esm.min.js', { root: path.join(__dirname, 'node_modules/socket.io/client-dist') });
 });
 
 // Route to prevent access to the server folder
