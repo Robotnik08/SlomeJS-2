@@ -7,7 +7,7 @@ const instance = new Game();
 
 const client = new Client(instance);
 
-const chat = new Chat(document.getElementById('chat-messages'), document.getElementById('chat-input'), instance);
+const chat = new Chat(document.getElementById('chat-messages'), document.getElementById('chat-input'), client);
 instance.chat = chat;
 
 instance.setTile = (position, type, background = false) => {

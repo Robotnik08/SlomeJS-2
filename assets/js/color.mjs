@@ -10,6 +10,10 @@ export class Color {
         return `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`;
     }
 
+    copy () {
+        return new Color(this.r, this.g, this.b, this.a);
+    }
+
     static get white () {
         return new Color(255, 255, 255, 1);
     }

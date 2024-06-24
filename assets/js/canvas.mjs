@@ -14,6 +14,10 @@ export class Canvas {
         });
     }
 
+    get object () {
+        return this.canvas;
+    }
+
     fitScreen () {
         if (this.autoResize) {
             this.width = window.innerWidth;

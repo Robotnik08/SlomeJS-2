@@ -8,17 +8,18 @@ import { Vector2 } from './vector.mjs';
 import { Player } from './player.mjs';
 import { World } from './world.mjs';
 import { Chat } from './chat.mjs';
+import { BreakParticle } from './break-particle.mjs';
+
 
 const time = new Time();
-const input = new Input();
 const sprites = new Sprites();
+const input = new Input();
 
 export class Game {
     constructor (client) {
         this.canvas = new Canvas(new Vector2(800, 600));
         this.canvas.autoResize = true;
         this.canvas.fitScreen();
-
 
 
         this.camera = new Vector2(0, 0);
@@ -37,16 +38,24 @@ export class Game {
 
         this.selectedTile = Vector2.zero;
 
+        this.chat = null;
+
         this.setTile = null;
 
         this.subscribeTimeEvent((dt) => {
             if (!this.world.loaded) return;
 
             this.draw(this.camera);
-            this.entities.forEach(entity => {
-                if (entity.move) entity.move(input, dt);
+
+            for (let i = this.entities.length - 1; i >= 0; i--) {
+                const entity = this.entities[i];
+                if (entity.destroyed) {
+                    this.entities.splice(this.entities.indexOf(entity), 1);
+                    continue;
+                }
+                if (!this.chat.typing) {if (entity.move) entity.move(input, dt);}
                 if (entity.update) entity.update(dt);
-            });
+            }
 
             this.camera = this.player.projectedPosition;
 
@@ -57,38 +66,59 @@ export class Game {
 
             this.player.angle = Math.atan2(input.mousePosition.y - this.canvas.height / 2, input.mousePosition.x - this.canvas.width / 2) * 180 / Math.PI;
 
-            if (input.getKey('Minus')) {
-                this.zoom *= 1.01;
-                if (this.zoom > this.zoomBounds.y) this.zoom = this.zoomBounds.y;
-            }
-            if (input.getKey('Equal')) {
-                this.zoom *= 0.99;
-                if (this.zoom < this.zoomBounds.x) this.zoom = this.zoomBounds.x;
-            }
+            if (!this.chat.typing) {
 
-            if (input.getKeyDown('LeftControl')) {
-                this.player.selectedType = 0;
-            }
-
-            
-            // hotbarselect
-            for (let i = 1; i <= 10; i++) {
-                if (input.getKey('Digit' + (i % 10)) && i - 1 <= sprites.max_tile_id) {
-                    this.player.selectedType = i - 1;
+                if (input.getKey('Minus')) {
+                    this.zoom *= 1.01;
+                    if (this.zoom > this.zoomBounds.y) this.zoom = this.zoomBounds.y;
                 }
+                if (input.getKey('Equal')) {
+                    this.zoom *= 0.99;
+                    if (this.zoom < this.zoomBounds.x) this.zoom = this.zoomBounds.x;
+                }
+
+                if (input.getKeyDown('LeftControl')) {
+                    this.player.selectedHotbar = 0;
+                }
+
+                
+                // hotbarselect
+                for (let i = 1; i <= 10; i++) {
+                    if (input.getKey('Digit' + (i % 10)) && i - 1 <= sprites.max_tile_id) {
+                        this.player.selectedHotbar = i - 1;
+                    }
+                }
+
+                if (input.scroll > 0) {
+                    this.player.selectedHotbar++;
+                    if (this.player.selectedHotbar > 9) this.player.selectedHotbar = 0;
+                }
+                if (input.scroll < 0) {
+                    this.player.selectedHotbar--;
+                    if (this.player.selectedHotbar < 0) this.player.selectedHotbar = 9;
+                }
+
+                if (input.getKeyDown('KeyE')) {
+                    this.player.selectedPage++;
+                    this.player.selectedPage %= Math.round(sprites.max_tile_id / 10);
+                }
+
             }
 
-            if (input.scroll > 0) {
-                this.player.selectedType++;
-                if (this.player.selectedType > sprites.max_tile_id) this.player.selectedType = 0;
-            }
-            if (input.scroll < 0) {
-                this.player.selectedType--;
-                if (this.player.selectedType < 0) this.player.selectedType = sprites.max_tile_id;
-            }
+            this.player.selectedType = this.player.selectedHotbar != 0 ? this.player.selectedHotbar + this.player.selectedPage * 10 : 0;
 
             if (input.getKeyDown('F3')) {
                 this.debug = !this.debug;
+            }
+
+            // open chat
+            if (input.getKeyDown('Enter')) {
+                document.getElementById('chat-input').focus();
+            }
+
+            // close chat
+            if (input.getKeyDown('Escape')) {
+                document.getElementById('chat-input').blur();
             }
 
             if (this.player.selectedType) {
@@ -99,7 +129,16 @@ export class Game {
                     this.setTile(this.selectedTile, this.player.selectedType, true);
                 }
             } else if (input.getKeyDown(Input.leftMouseButton)) {
-                this.setTile(this.selectedTile, 0, this.world.getTile(this.selectedTile) === 0);
+                const isBackground = this.world.getTile(this.selectedTile) === 0;
+                if (isBackground && this.world.getTile(this.selectedTile, true)) {
+                    const color = sprites.getTileColor(this.world.getTile(this.selectedTile, true));
+                    this.setTile(this.selectedTile, 0, isBackground);
+                    this.entities.push(...BreakParticle.spawnGroup(this.selectedTile.add(new Vector2(0.5, 0.5)), new Vector2(0.2, 0.2), color, 10));
+                } else if (!isBackground) {
+                    const color = sprites.getTileColor(this.world.getTile(this.selectedTile));
+                    this.setTile(this.selectedTile, 0, isBackground);
+                    this.entities.push(...BreakParticle.spawnGroup(this.selectedTile.add(new Vector2(0.5, 0.5)), new Vector2(0.2, 0.2), color, 10));
+                }
             }
 
 
@@ -145,7 +184,7 @@ export class Game {
             for (let y = Math.max(0, camera.y - Math.round(unit_camera_size.y / 2 + 2)); y < Math.min(this.world.size.y, camera.y + Math.round(unit_camera_size.y / 2 + 2)); y++) {
                 const position = new Vector2(x, y);
                 
-                if (!this.world.getTile(position) || sprites.is_transparent[this.world.getTile(position)]) {
+                if (sprites.getTransparent(this.world.getTile(position))) {
                     if (this.world.getTile(position, true)) {
                         const sprite = sprites.getTile(this.world.getTile(position, true), true);
                         this.canvas.drawSprite(sprite, position.multiply(this.canvas.height * (1/this.zoom)).subtract(camera_pixel), new Vector2(this.canvas.height * (1/this.zoom) + 1, this.canvas.height * (1/this.zoom) + 1), false, false);
@@ -156,7 +195,6 @@ export class Game {
                     const sprite = sprites.getTile(this.world.getTile(position));
                     this.canvas.drawSprite(sprite, position.multiply(this.canvas.height * (1/this.zoom)).subtract(camera_pixel), new Vector2(this.canvas.height * (1/this.zoom) + 1, this.canvas.height * (1/this.zoom) + 1), false, false);
                 }
-
             }
         }
 
@@ -167,11 +205,15 @@ export class Game {
         for (let i in this.entities) {
             if (isNaN(i)) continue;
             const entity = this.entities[this.entities.length - i - 1];
-            const sprite = sprites.getSprite(entity.sprite);
             let position = entity.projectedPosition.multiply(this.canvas.height * (1/this.zoom));
             position = position.subtract(camera_pixel);
 
-            this.canvas.drawSprite(sprite, position, entity.size.multiply(this.canvas.height * (1/this.zoom)), 0);
+            if (entity.usesSprite) {
+                const sprite = sprites.getSprite(entity.sprite);
+                this.canvas.drawSprite(sprite, position, entity.size.multiply(this.canvas.height * (1/this.zoom)), 0);
+            } else {
+                this.canvas.drawRect(position, entity.size.multiply(this.canvas.height * (1/this.zoom)), entity.color);
+            }
 
             // draw tile in hand
             if (entity.IS_PLAYER || entity.IS_OTHER_PLAYER) {
@@ -187,7 +229,6 @@ export class Game {
                 );
             }
         }
-
         this.drawUI();
 
         const debug_text = document.getElementById('debug');
@@ -217,8 +258,8 @@ export class Game {
 
         const hotbar_start_offset = new Vector2(this.canvas.width / 1.896 - hotbar_size.x / 2, this.canvas.height*0.99 - hotbar_size.y + hotbar_size.y/2);
         // draw each item id in hotbar
-        for (let i = 0; i < sprites.max_tile_id + 1; i++) {
-            const sprite = sprites.getTile(i);
+        for (let i = 0; i < 10; i++) {
+            const sprite = sprites.getTile(i == 0 ? 0 : i + this.player.selectedPage * 10);
             const size = Vector2.one.multiply(this.canvas.height).divide(17);
             const position = hotbar_start_offset.add(new Vector2(size.x * i + i * size.x/1.51, 0));
             this.canvas.drawSprite(sprite, position, size, 0, true);

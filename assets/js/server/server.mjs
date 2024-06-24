@@ -3,6 +3,7 @@ import { Vector2 } from "../vector.mjs";
 import { generate } from "./generator.mjs";
 import { PlayerClient } from "./player-client.mjs";
 import { SaveManager } from "./save-manager.mjs";
+import { Console } from "./console.mjs";
 
 export class Server {
     constructor (io) {
@@ -11,14 +12,124 @@ export class Server {
         this.players = [];
         this.worlds = {};
 
+        this.focusedWorld = null;
+
         this.io.on('connection', this.userSocket.bind(this));
 
         this.saveManager = new SaveManager();
+
+        this.console = new Console();
+
+        
+        this.console.addCommand('focus', (world) => {
+            if (!world) {
+                console.log('Usage: focus <world>');
+                return;
+            }
+            this.focusedWorld = world;
+            console.log(`Focused on world '${world}'`);
+        });
+
+        this.console.addCommand('unfocus', () => {
+            console.log(`Unfocused from '${this.focusedWorld}'`);
+            this.focusedWorld = null;
+        });
+
+        this.console.addCommand('listworlds', () => {
+            console.log('Worlds:');
+            console.log(Object.keys(this.worlds));
+        });
+
+        this.console.addCommand('listplayers', () => {
+            console.log('Players:');
+            this.players.forEach(player => {
+                console.log(player.name + ' in (' + player.connected_world + ')');
+            });
+        });
+
+        this.console.addCommand('say', (...args) => {
+            if (args.length === 0) {
+                console.log('Usage: say <message>');
+                return;
+            }
+            if (this.focusedWorld === null) {
+                console.log('No world focused');
+                return;
+            }
+            const message = args.join(' ');
+            this.serverLog(`${message}`);
+            this.io.to(this.focusedWorld).emit('chat', {author: null, message: message});
+        });
+
+        this.console.addCommand('broadcast', (...args) => {
+            if (args.length === 0) {
+                console.log('Usage: broadcast <message>');
+                return;
+            }
+            const message = args.join(' ');
+            this.serverLog(`${message}`);
+            this.io.emit('chat', {author: null, message: message});
+        });
+
+        this.console.addCommand('kick', (name) => {
+            if (!name) {
+                console.log('Usage: kick <player>');
+                return;
+            }
+            const player = this.players.find(player => player.name === name);
+            if (player) {
+                player.socket.disconnect(true);
+                console.log(`Kicked ${name}`);
+            } else {
+                console.log('Player not found');
+            }
+        });
+
+        this.console.addCommand('kickall', () => {
+            console.log('Kicking all players...');
+            this.players.forEach(player => player.socket.disconnect(true));
+            console.log('Kicked all players');
+        });
+
+        this.console.addCommand('save', (world) => {
+            if (!world) {
+                console.log('Usage: save <world>');
+                return;
+            }
+            if (this.worlds[world]) {
+                this.saveManager.saveWorld(this.worlds[world], world);
+                console.log(`Saved world '${world}'`);
+            } else {
+                console.log('World not found');
+            }
+        });
+
+        this.console.addCommand('saveall', () => {
+            console.log('Saving all worlds...');
+            for (const world in this.worlds) {
+                this.saveManager.saveWorld(this.worlds[world], world);
+            }
+            console.log('Saved all worlds');
+        });
+
+        this.console.addCommand('stop', () => {
+            console.log('Stopping server...');
+            process.exit(0);
+        });
+    }
+
+    getIfFocused (world) {
+        return this.focusedWorld === null || this.focusedWorld === world;
+    }
+
+    serverLog (message) {
+        const time = new Date().toLocaleTimeString();
+        console.log("[" + time + "] " + message);
     }
 
     userSocket (socket) {
         if (!socket.request.session || !socket.request.session.user) {
-            console.log('Unauthorized user tried to connect');
+            this.serverLog('Unauthorized user tried to connect');
             socket.disconnect(true);
             return;
         }
@@ -39,13 +150,17 @@ export class Server {
 
         this.players.push(player);
 
-        console.log(`<${player.name}> connected`);
-
-
-        this.io.emit('chat', {author: null, message: username + ' has joined the world!'});
 
         socket.on('chat', (data) => {
-            this.io.emit('chat', {author: username, message: data});
+            if (typeof data !== 'string') return;
+
+            if (data.length > 100) {
+                socket.emit('chat', {author: null, message: "Message is too long!"});
+                return;
+            }
+            if (data.length === 0) return; // no empty messages
+            if (this.getIfFocused(player.connected_world)) this.serverLog(`<${username}> ${data}`);
+            this.io.to(player.connected_world).emit('chat', {author: username, message: data});
         });
         
         socket.on('world', (data) => {
@@ -68,7 +183,9 @@ export class Server {
     
                         player.connected_world = data;
                         socket.join(player.connected_world);
-                        console.log(`<${player.name}> joined world <${data}>`);
+                        this.io.to(player.connected_world).emit('chat', {author: null, message: username + ' has joined the world!'});
+                        
+                        if (this.getIfFocused(data)) this.serverLog(`${player.name} joined world (${data})`);
     
                         player.loaded = true;
                     } else {
@@ -89,7 +206,8 @@ export class Server {
         
                             player.connected_world = data;
                             socket.join(player.connected_world);
-                            console.log(`<${player.name}> joined world <${data}>`);
+                            this.io.to(player.connected_world).emit('chat', {author: null, message: username + ' has joined the world!'});
+                            if (this.getIfFocused(data)) this.serverLog(`${player.name} joined world (${data})`);
         
                             player.loaded = true;
                         });
@@ -112,7 +230,9 @@ export class Server {
 
                     player.connected_world = data;
                     socket.join(player.connected_world);
-                    console.log(`<${player.name}> joined world <${data}>`);
+                    this.io.to(player.connected_world).emit('chat', {author: null, message: username + ' has joined the world!'});
+
+                    if (this.getIfFocused(data)) this.serverLog(`${player.name} joined world (${data})`);
 
                     player.loaded = true;
                 });
@@ -121,8 +241,9 @@ export class Server {
 
         socket.on('disconnect', () => {
             if (this.worlds[player.connected_world] != null) this.saveManager.saveWorld(this.worlds[player.connected_world], player.connected_world);
+            this.io.to(player.connected_world).emit('chat', {author: null, message: username + ' has left the world!'});
+            if (this.getIfFocused(player.connected_world)) this.serverLog(`${player.name} disconnected`);
             this.players.splice(this.players.indexOf(player), 1);
-            console.log(`<${player.name}> disconnected`);
         });
 
         socket.on('move', (data) => {

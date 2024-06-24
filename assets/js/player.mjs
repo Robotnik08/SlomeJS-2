@@ -17,6 +17,8 @@ export class Player extends Entity {
         this.acceleration = 0.09;
         this.jumpStrength = 12;
 
+        this.selectedHotbar = 0;
+        this.selectedPage = 0;
         this.selectedType = 0;
         this.angle = 0;
 

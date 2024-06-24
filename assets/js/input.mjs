@@ -1,7 +1,7 @@
 import { Vector2 } from "./vector.mjs";
 
 export class Input {
-    constructor () {
+    constructor (clickChecker = null) {
         this.mouse = Vector2.zero;
         this.scroll = 0;
         this.keys = {};
@@ -38,15 +38,16 @@ export class Input {
                 this.keys_down[event.code] = true;
         });
 
+
         window.addEventListener('keyup', event => {
             this.keys[event.code] = false;
         });
 
-        window.addEventListener('contextmenu', event => {
+        (clickChecker ?? window).addEventListener('contextmenu', event => {
             event.preventDefault();
         });
 
-        window.addEventListener('mousedown', event => {
+        (clickChecker ?? window).addEventListener('mousedown', event => {
             this.keys[event.button] = true;
             this.keys_down[event.button] = true;
         });

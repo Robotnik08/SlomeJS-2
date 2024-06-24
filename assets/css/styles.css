@@ -33,7 +33,24 @@ canvas {
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
     font-size: 2vh;
+    overflow: hidden;
+}
+
+#chat-input {
+    width: 100%;
+    height: 20%;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    font-size: 2vh;
+    user-select: none;
+    pointer-events: none;
+}
+
+#chat-messages {
     overflow-y: auto;
+    width: 100%;
+    height: 80%;
 }
 
 #debug {

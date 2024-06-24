@@ -21,7 +21,7 @@ export class Chat {
             this.typing = false;
         });
 
-        this.input.addEventListener('focus', () => {
+        this.input.addEventListener('focus', (e) => {
             this.input.value = '';
             this.typing = true;
         });
@@ -34,6 +34,7 @@ export class Chat {
         span.classList.add('chat-message');
         span.innerHTML = message.toString() + '<br>';
         this.chatbox.appendChild(span);
+        this.chatbox.scrollTop = this.chatbox.scrollHeight;
     }
 
     clear () {
