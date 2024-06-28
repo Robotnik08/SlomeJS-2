@@ -41,7 +41,7 @@ export class SaveManager {
     }
 
     async linkWorld (id, owner) {
-        const query = `INSERT INTO accounts_worlds (world_id, account_id) VALUES ('${id}', '${owner}')`;
+        const query = `INSERT INTO accounts_worlds (world_id, account_id, whitelist) VALUES ('${id}', '${owner}', "")`;
         main_db.execute(query);
     }
 
