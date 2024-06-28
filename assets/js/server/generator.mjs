@@ -53,7 +53,7 @@ export function generate (world) {
         if (Math.random() < bushChance) {
             for (let y = 0; y < size.y; y++) {
                 if (world.tiles[y][x] === 1) {
-                    world.tiles[y - 1][x] = Math.random() < 0.2 ? flowerTypes[Math.round(Math.random() * flowerTypes.length)] : Math.random() < 0.5 ? 21 : 22;
+                    world.tiles[y - 1][x] = Math.random() < 0.2 ? flowerTypes[Math.round(Math.random() * (flowerTypes.length - 1))] : Math.random() < 0.5 ? 21 : 22;
                     break;
                 }
             }
@@ -65,7 +65,7 @@ export function generate (world) {
         for (let y = 0; y < size.y; y++) {
             if (Math.random() < oreChance) {
                 if (world.tiles[y][x] === 3) {
-                    world.tiles[y][x] = oreTypes[Math.round(Math.random() * oreTypes.length)];
+                    world.tiles[y][x] = oreTypes[Math.round(Math.random() * (oreTypes.length - 1))];
                 }
             }
         }
