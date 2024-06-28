@@ -8,7 +8,7 @@ const treeLeaves = [
 ];
 
 const treeChance = 0.06;
-const oreChance = 0.1;
+const oreChance = 0.04;
 const bushChance = 0.25;
 
 const flowerTypes = [23, 24, 25, 26, 27, 28, 29];
