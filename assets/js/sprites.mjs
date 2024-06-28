@@ -16,7 +16,6 @@ export class Sprites {
 
         
         
-        
         this.tiles = [
             new TileData('img/game/tiles/missing_block.png', true, false), // air
             new TileData('img/game/tiles/grass.png', false, true),

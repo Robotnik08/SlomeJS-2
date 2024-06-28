@@ -8,9 +8,11 @@ const treeLeaves = [
 ];
 
 const treeChance = 0.06;
+const oreChance = 0.1;
 const bushChance = 0.25;
 
 const flowerTypes = [23, 24, 25, 26, 27, 28, 29];
+const oreTypes = [11, 12, 13];
 
 export function generate (world) {
     const smoothness = 0.1;
@@ -53,6 +55,17 @@ export function generate (world) {
                 if (world.tiles[y][x] === 1) {
                     world.tiles[y - 1][x] = Math.random() < 0.2 ? flowerTypes[Math.round(Math.random() * flowerTypes.length)] : Math.random() < 0.5 ? 21 : 22;
                     break;
+                }
+            }
+        }
+    }
+
+    // add some ores 
+    for (let x = 0; x < size.x; x++) {
+        for (let y = 0; y < size.y; y++) {
+            if (Math.random() < oreChance) {
+                if (world.tiles[y][x] === 3) {
+                    world.tiles[y][x] = oreTypes[Math.round(Math.random() * oreTypes.length)];
                 }
             }
         }

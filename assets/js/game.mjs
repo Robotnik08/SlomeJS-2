@@ -37,6 +37,7 @@ export class Game {
         this.player.projectedPosition = this.player.position;
 
         this.selectedTile = Vector2.zero;
+        this.buildRange = 4;
 
         this.chat = null;
 
@@ -62,9 +63,13 @@ export class Game {
             const aspect_ratio = this.canvas.size.x / this.canvas.size.y;
 
             this.selectedTile = new Vector2 ((input.mousePosition.x / (this.canvas.height * aspect_ratio) * this.zoom * aspect_ratio) - (this.zoom * aspect_ratio / 2), (input.mousePosition.y / this.canvas.height * this.zoom) - (this.zoom / 2));
+            const distance = this.selectedTile.magnitude;
+            this.selectedTile = this.selectedTile.normalize().multiply(Math.min(this.buildRange, distance));
             this.selectedTile = this.selectedTile.add(this.camera).subtract(new Vector2(0.5, 0.5)).round();
 
+            // player angle in degrees
             this.player.angle = Math.atan2(input.mousePosition.y - this.canvas.height / 2, input.mousePosition.x - this.canvas.width / 2) * 180 / Math.PI;
+
 
             if (!this.chat.typing) {
 
@@ -122,7 +127,7 @@ export class Game {
             }
 
             if (this.player.selectedType) {
-                if (input.getKeyDown(Input.leftMouseButton) && this.world.getTile(this.selectedTile) === 0 && this.checkIfTileCollider(this.selectedTile) && this.world.checkPlacement(this.selectedTile)) {
+                if (input.getKeyDown(Input.leftMouseButton) && this.world.getTile(this.selectedTile) === 0 && (this.checkIfTileCollider(this.selectedTile) || !sprites.getCollision(this.player.selectedType)) && this.world.checkPlacement(this.selectedTile)) {
                     this.setTile(this.selectedTile, this.player.selectedType);
                 }
                 if (input.getKeyDown(Input.rightMouseButton) && this.world.getTile(this.selectedTile, true) === 0 && (this.world.checkPlacement(this.selectedTile, true) || this.world.checkPlacement(this.selectedTile))) {

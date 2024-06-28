@@ -19,6 +19,10 @@ export class Vector2 {
     divide (scalar) {
         return new Vector2(this.x / scalar, this.y / scalar);
     }
+
+    bound (vector) {
+        return new Vector2(Math.min(Math.max(this.x, -vector.x), vector.x), Math.min(Math.max(this.y, -vector.y), vector.y));
+    }
     
     get magnitude () {
         return Math.sqrt(this.x * this.x + this.y * this.y);

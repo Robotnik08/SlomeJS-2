@@ -34,9 +34,9 @@ export class Canvas {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    drawSprite (sprite, position, size, rotation = false, center_origin = true, translation = new Vector2(0, 0), flipX = false, flipY = false) {
+    drawSprite (sprite, position, size, rotation = null, center_origin = true, translation = new Vector2(0, 0), flipX = false, flipY = false) {
 
-        if (rotation) {
+        if (rotation !== null) {
             this.context.save();
             this.context.translate(position.x, position.y);
             this.context.scale(flipX ? -1 : 1, flipY ? -1 : 1);
@@ -62,9 +62,9 @@ export class Canvas {
         );
     }
 
-    drawText (text, position, size, color, rotation = false) {
+    drawText (text, position, size, color, rotation = null) {
 
-        if (rotation) {
+        if (rotation !== null) {
             this.context.save();
             this.context.translate(position.x, position.y);
             this.context.rotate(rotation * Math.PI / 180);
@@ -80,9 +80,9 @@ export class Canvas {
         this.context.fillText(text, position.x, position.y);
     }
 
-    drawCircle (position, radius, color, rotation = false) {
+    drawCircle (position, radius, color, rotation = null) {
 
-        if (rotation) {
+        if (rotation !== null) {
             this.context.save();
             this.context.translate(position.x, position.y);
             this.context.rotate(rotation * Math.PI / 180);
@@ -100,9 +100,9 @@ export class Canvas {
         this.context.fill();
     }
 
-    drawRect (position, size, color, rotation = false) {
+    drawRect (position, size, color, rotation = null) {
 
-        if (rotation) {
+        if (rotation !== null) {
             this.context.save();
             this.context.translate(position.x, position.y);
             this.context.rotate(rotation * Math.PI / 180);
